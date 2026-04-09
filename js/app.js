@@ -72,6 +72,22 @@ const App = {
         document.getElementById('tab-content-signups').classList.toggle('hidden', tabName !== 'signups');
         document.getElementById('tab-content-comp').classList.toggle('hidden', tabName !== 'comp');
     },
+    async confirmDelete(event, raidId, raidTitle) {
+        // Empêche l'ouverture du raid quand on clique sur la poubelle
+        event.stopPropagation();
+
+        const confirmed = confirm(`Es-tu sûr de vouloir supprimer le raid "${raidTitle}" ?\nCela supprimera aussi le salon sur Discord.`);
+        
+        if (confirmed) {
+            try {
+                await RaidAPI.deleteRaid(raidId);
+                alert("Raid supprimé avec succès.");
+                location.reload(); // On rafraîchit la liste
+            } catch (e) {
+                alert("Erreur lors de la suppression : " + e.message);
+            }
+        }
+    },
     
 };
 

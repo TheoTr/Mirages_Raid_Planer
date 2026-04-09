@@ -1,16 +1,22 @@
 const UI = {
     renderRaidCard(raid) {
-        const date = new Date(raid.startTime * 1000).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
-        return `
-            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl hover:border-orange-500 cursor-pointer transition group" onclick="App.loadRaid('${raid.id}')">
-                <div class="flex justify-between items-start mb-4">
-                    <span class="text-orange-500 font-mono text-xs font-bold uppercase tracking-widest">${date}</span>
-                    <span class="bg-slate-800 text-slate-400 text-[10px] px-2 py-1 rounded">ID: ${raid.id.slice(-4)}</span>
+            const date = new Date(raid.startTime * 1000).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+            return `
+                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl hover:border-orange-500 cursor-pointer transition group relative" onclick="App.loadRaid('${raid.id}')">
+                    <button onclick="App.confirmDelete(event, '${raid.id}', '${raid.title.replace(/'/g, "\\'")}')" 
+                            class="absolute top-4 right-4 text-slate-600 hover:text-red-500 transition-colors p-1 z-10">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-orange-500 font-mono text-xs font-bold uppercase tracking-widest">${date}</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white group-hover:text-orange-500 transition pr-6">${raid.title}</h3>
                 </div>
-                <h3 class="text-xl font-bold text-white group-hover:text-orange-500 transition">${raid.title}</h3>
-            </div>
-        `;
-    },
+            `;
+        },
 
     renderPlayerBadge(player) {
         const color = CONFIG.CLASS_COLORS[(player.className || "").toLowerCase()] || '#94a3b8';
