@@ -1,0 +1,13 @@
+/* style.css */
+.tab-link {
+    @apply py-4 text-sm font-bold uppercase tracking-widest transition-all;
+    color: #64748b;
+}
+
+.tab-link.active {
+    @apply border-b-2 border-orange-500 text-orange-500;
+}
+
+.tab-panel.hidden {
+    display: none;
+}
