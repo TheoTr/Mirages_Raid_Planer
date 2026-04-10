@@ -31,44 +31,45 @@ const RaidAPI = {
         });
         return await response.json();
     },
-async createRaid(presetKey, date, time, channelName) {
-    const preset = CONFIG.RAID_PRESETS[presetKey];
-    
-    // On utilise ton proxy habituel
-    const url = `${CONFIG.BASE_URL}/servers/${CONFIG.SERVER_ID}/channels/${CONFIG.DEFAULT_CHANNEL_ID}/event`;
-    
-    const body = {
-        leaderId: String(CONFIG.MY_DISCORD_ID),
-        templateId: preset.templateId,
-        date: date,
-        time: time,
-        title: preset.title,
-        // On met TOUT dans advancedSettings, c'est ce que corsproxy préfère
-        advancedSettings: {
-            "create_channel": "true",
-            "channel_name": String(channelName),
-            "channel_category": String(preset.categoryId)
+    async createRaid(presetKey, date, time, channelId, suffix) {
+        const preset = CONFIG.RAID_PRESETS[presetKey];
+        
+        // On construit le titre : "Karazhan de Marijane" ou juste "Karazhan"
+        const customTitle = suffix ? `${preset.title} de ${suffix}` : preset.title;
+        
+        const url = `${CONFIG.BASE_URL}/servers/${CONFIG.SERVER_ID}/channels/${channelId}/event`;
+        
+        const body = {
+            leaderId: String(CONFIG.MY_DISCORD_ID),
+            templateId: preset.templateId,
+            date: date,
+            time: time,
+            title: customTitle,
+            description: "Raid planifié via Mirages Manager"
+        };
+
+        const response = await fetch(CONFIG.PROXY + encodeURIComponent(url), {
+            method: 'POST',
+            headers: { 
+                "Authorization": CONFIG.API_KEY,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(body)
+        });
+
+        if (!response.ok) {
+            let errorMsg;
+            try {
+                const errJson = await response.json();
+                errorMsg = errJson.message || JSON.stringify(errJson);
+            } catch(e) {
+                errorMsg = await response.text();
+            }
+            throw new Error(errorMsg);
         }
-    };
 
-    const response = await fetch(CONFIG.PROXY + encodeURIComponent(url), {
-        method: 'POST',
-        headers: { 
-            "Authorization": CONFIG.API_KEY,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(body)
-    });
-
-    if (!response.ok) {
-        const text = await response.text();
-        throw new Error(text);
-    }
-
-    alert("Raid envoyé ! Vérifie si le salon s'est créé.");
-    location.reload();
-},
-
+        return await response.json();
+    },
     async deleteRaid(raidId) {
         const url = `${CONFIG.BASE_URL}/events/${raidId}`;
         const response = await fetch(CONFIG.PROXY + encodeURIComponent(url), {

@@ -8,12 +8,12 @@ const CONFIG = {
     
     RAID_PRESETS: {
         'kz': {
-            title: "Karazhan (10)",
+            title: "Karazhan",
             templateId: "wowtbc", // Utilise templateId comme sur ton screen
             categoryId: "1491788232575418500" 
         },
         'gruul': {
-            title: "Gruul / Magthéridon (25)",
+            title: "Gruul / Magthéridon",
             templateId: "wowtbc",
             categoryId: "1491788302452391956"
         }

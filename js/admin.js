@@ -17,19 +17,23 @@ const Admin = {
     },
 
     async executeCreation() {
+        // 1. On récupère les valeurs des champs HTML
         const dateVal = document.getElementById('input-raid-date').value;
         const timeVal = document.getElementById('input-raid-time').value;
-        const suffix = document.getElementById('input-raid-suffix').value.trim() || "raid";
         
-        // Construction du nom du channel : KZ-mercredi-16-avril-marijane
-        const dateObj = new Date(dateVal);
-        const jours = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
-        const moisNoms = ['janvier', 'fevrier', 'mars', 'avril', 'mai', 'juin', 'juillet', 'aout', 'septembre', 'octobre', 'novembre', 'decembre'];
+        // On récupère le suffixe (ex: Marijane)
+        const suffix = document.getElementById('input-raid-suffix').value.trim();
         
-        const preset = CONFIG.RAID_PRESETS[this.selectedPreset];
-        const channelName = `${preset.title.split(' ')[0]}-${jours[dateObj.getDay()]}-${dateObj.getDate()}-${moisNoms[dateObj.getMonth()]}-${suffix}`.toLowerCase();
+        // On récupère l'ID du salon
+        const channelId = document.getElementById('input-raid-channel-id').value.trim();
 
-        // Format Date pour Raid-Helper : JJ-MM-AAAA
+        // On vérifie que les champs obligatoires sont remplis
+        if (!dateVal || !timeVal || !channelId) {
+            alert("Erreur : La date, l'heure et l'ID du salon sont obligatoires !");
+            return;
+        }
+
+        // Format Date pour Raid-Helper (JJ-MM-AAAA)
         const [y, m, d] = dateVal.split('-');
         const formattedDate = `${d}-${m}-${y}`;
 
@@ -38,9 +42,10 @@ const Admin = {
             btn.innerText = "CRÉATION EN COURS...";
             btn.disabled = true;
 
-            await RaidAPI.createRaid(this.selectedPreset, formattedDate, timeVal, channelName);
+            // APPEL DE L'API : On ajoute "suffix" en dernier paramètre
+            await RaidAPI.createRaid(this.selectedPreset, formattedDate, timeVal, channelId, suffix);
             
-            alert(`Succès ! Salon créé : ${channelName}`);
+            alert(`Succès ! Raid posté.`);
             location.reload();
         } catch (e) {
             alert("Erreur : " + e.message);
@@ -48,7 +53,7 @@ const Admin = {
             btn.innerText = "CONFIRMER LA CRÉATION";
             btn.disabled = false;
         }
-    },
+    },  
 
     cancel() {
         document.getElementById('creation-confirm').classList.add('hidden');
