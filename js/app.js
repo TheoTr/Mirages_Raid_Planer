@@ -1,5 +1,6 @@
 const App = {
     currentData: null,
+    currentRaidId: null,
 
     async init() {
         this.bindEvents();
@@ -26,6 +27,7 @@ const App = {
     },
 
     async loadRaid(id) {
+        this.currentRaidId = id;
         this.showView('details');
         const header = document.getElementById('raid-info');
         header.innerHTML = "<p class='animate-pulse text-orange-500'>Chargement...</p>";
@@ -34,13 +36,13 @@ const App = {
             // 1. On récupère les infos du raid
             this.currentData = await RaidAPI.fetchRaidDetails(id);
             header.innerHTML = `<h2 class="text-4xl font-black uppercase italic">${this.currentData.title}</h2>`;
-            
+
             // 2. On affiche les inscrits (liste brute)
             this.renderSignups();
 
             // 3. On récupère la compo associée (L'ID de la compo est le même que celui du raid dans ton JSON)
             const compDetails = await RaidAPI.fetchCompDetails(id);
-            UI.renderComposition(compDetails);
+            UI.renderComposition(compDetails, this.currentData.signUps || []);
 
         } catch (e) {
             console.error(e);
@@ -71,6 +73,18 @@ const App = {
         document.querySelectorAll('.tab-link').forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
         document.getElementById('tab-content-signups').classList.toggle('hidden', tabName !== 'signups');
         document.getElementById('tab-content-comp').classList.toggle('hidden', tabName !== 'comp');
+
+        // Re-attache le listener du bouton poster quand on arrive sur l'onglet comp
+        if (tabName === 'comp') {
+            const btn = document.getElementById('btn-open-post-modal');
+            if (btn) {
+                btn.replaceWith(btn.cloneNode(true)); // Supprime les anciens listeners
+                document.getElementById('btn-open-post-modal').addEventListener('click', () => {
+                    console.log('CLIC BOUTON POSTER');
+                    UI.openPostModal();
+                });
+            }
+        }
     },
     async confirmDelete(event, raidId, raidTitle) {
         // Empêche l'ouverture du raid quand on clique sur la poubelle
